@@ -56,7 +56,7 @@ public class WordCountTest {
     private static final String[] COUNTS_ARRAY = new String[]{
             "hi: 5", "there: 1", "sue: 2", "bob: 2"};
 
-    // Creates a Test Pipeline (can define different PipelineOptions.
+    // Creates a Test Pipeline (can define different PipelineOptions)
     // By using @Rule, we get the TestPipeline "refreshed" between each unit test (@Test)
     @Rule
     public TestPipeline p = TestPipeline.create();
@@ -89,7 +89,7 @@ public class WordCountTest {
         // Convert words of text into individual words.
         PCollection<String> words = input.apply(
                 ParDo.of(new WordCount.ExtractWordsFn()));
-        // asserts that the tokenized words contain the expected output words
+        // method 1: asserts that the tokenized words contain the expected output words
         PAssert.that(words).satisfies((SerializableFunction<Iterable<String>, Void>) inIt -> {
             // checks if the WORDS_USED contains all the words extracted
             inIt.forEach(in ->
@@ -97,7 +97,7 @@ public class WordCountTest {
             );
             return null;
         });
-        // alterantively: define the SerializableFunction as a separate function (useful if used in multiple places)
+        // method 2: define the SerializableFunction as a separate function (useful if used in multiple places)
         PAssert.that(words).satisfies(new VerifyWords(WORDS_USED_LIST));
         // blocks and waits for the pipeline to finish
         p.run().waitUntilFinish();
@@ -115,7 +115,6 @@ public class WordCountTest {
 
         @Override
         public Void apply(Iterable<String> actualIter) {
-            System.out.println("TEST: originalWords = " + originalWords);
             for (String s : actualIter)
                 assertTrue(originalWords.contains(s));
             return null;
